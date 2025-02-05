@@ -18,7 +18,7 @@ pip install exifool
 
 CLI options:
 
-```bash
+```
 exifool --help
 
 Usage: exifool [OPTIONS]
