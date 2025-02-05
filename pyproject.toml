@@ -1,0 +1,20 @@
+[project]
+name = "exifool"
+version = "0.1.0"
+description = "Metadata analysis tool written for CSEC-473"
+authors = [
+    {name = "sapph2c",email = "arn4006@g.rit.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click (>=8.1.8,<9.0.0)"
+]
+
+[tool.poetry.scripts]
+exifool = "exifool.cli:cli"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
