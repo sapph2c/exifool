@@ -30,7 +30,7 @@ Usage: exifool [OPTIONS]
   /_______  /__/\_ \__||__|  \____/ \____/|____/
           \/      \/
 
-  Written with ❤️  by sapph2c
+  Written with ❤️ by sapph2c
 
   Metadata analysis tool written for CSEC-473
 
