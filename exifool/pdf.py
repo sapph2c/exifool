@@ -1,4 +1,4 @@
-from exifool.extractor import Extractor
+from exifool.extractor import Extractor, close_file
 from pypdf import PdfReader
 
 
@@ -7,8 +7,7 @@ class Pdf(Extractor):
     Pdf is a class that enables retrieval of PDF metadata.
     """
 
-    def __init__(self, file) -> None:
-        self.reader = PdfReader(file)
-
+    @close_file
     def get_metadata(self) -> list:
-        return self.reader.metadata
+        reader = PdfReader(self.file)
+        return reader.metadata

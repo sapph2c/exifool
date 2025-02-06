@@ -1,6 +1,6 @@
 [project]
 name = "exifool"
-version = "0.1.0"
+version = "0.1.1"
 description = "Metadata analysis tool written for CSEC-473"
 authors = [
     {name = "sapph2c",email = "arn4006@g.rit.edu"}
