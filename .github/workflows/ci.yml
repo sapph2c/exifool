@@ -1,14 +1,11 @@
 name: CI
 on:
   pull_request:
-  branches: 
-    - main
-  types: [closed]
+    branches: [main]
 
 jobs:
-  build:
-    name: Build distribution 📦
-    runs-on: ubuntu-latest
+  test:
+    name: Runs tests 🧪
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,6 +25,17 @@ jobs:
         with:
           path: ./.venv
           key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Run tests
+        run: poetry run tox
+      - name: Run linter
+        run: poetry run ruff check
+
+  build:
+    name: Build distribution 📦
+    needs:
+    - test
+    runs-on: ubuntu-latest
+    steps:
       - name: Build a binary wheel and a source tarball
         run: poetry build
       - name: Store the distribution packages
