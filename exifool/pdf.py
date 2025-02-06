@@ -8,6 +8,6 @@ class Pdf(Extractor):
     """
 
     @close_file
-    def get_metadata(self) -> list:
+    def get_metadata(self) -> dict:
         reader = PdfReader(self.file)
         return reader.metadata

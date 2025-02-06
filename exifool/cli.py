@@ -6,7 +6,7 @@ import rich
 
 @click.command()
 @click.option("--path", help="Path to the file to perform metadata analysis on.")
-def cli(path: str, max_content_width=120):
+def cli(path: str):
     """
     \b
     ___________      .__  _____             .__
