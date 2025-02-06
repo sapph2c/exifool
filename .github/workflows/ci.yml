@@ -39,6 +39,24 @@ jobs:
     - test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v4
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
       - name: Build a binary wheel and a source tarball
         run: poetry build
       - name: Store the distribution packages
@@ -46,6 +64,7 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
+
   publish-to-pypi:
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
@@ -66,6 +85,7 @@ jobs:
         path: dist/
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+
   github-release:
     name: >-
       Sign the Python 🐍 distribution 📦 with Sigstore
@@ -103,6 +123,7 @@ jobs:
         gh release upload
         "$GITHUB_REF_NAME" dist/**
         --repo "$GITHUB_REPOSITORY"
+
   publish-to-testpypi:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
