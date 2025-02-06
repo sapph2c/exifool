@@ -9,11 +9,11 @@ class Extractor:
     def __init__(self, file):
         self.file = file
 
-    def get_metadata(self) -> list:
+    def get_metadata(self) -> dict:
         """
         Return all file metadata.
         """
-        return []
+        return {}
 
 
 def close_file(func):
