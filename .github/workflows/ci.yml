@@ -26,6 +26,7 @@ jobs:
         with:
           path: ./.venv
           key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
         run: poetry install
       - name: Run tests
         run: poetry run tox
