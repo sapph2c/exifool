@@ -1,6 +1,6 @@
 [project]
 name = "exifool"
-version = "0.1.6"
+version = "0.1.7"
 description = "Metadata retrieval tool"
 readme = "README.md"
 requires-python = ">=3.13"
