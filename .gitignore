@@ -3,3 +3,4 @@ tests/*.pdf
 dist
 *.coverage
 *.tox
+*.egg-info

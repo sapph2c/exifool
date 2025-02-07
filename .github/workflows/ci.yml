@@ -5,7 +5,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    # Only run for PR events that are not “closed” (i.e. open, updated, or reopened)
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -17,33 +16,24 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v4
-
-      - name: Setup a local virtual environment (if no poetry.toml file)
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-
-      - uses: actions/cache@v3
-        name: Cache virtual environment
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          python-version-file: "pyproject.toml"
 
       - name: Install dependencies
-        run: poetry install
+        run: uv sync --all-extras --dev
 
       - name: Run tests
-        run: poetry run tox
+        run: uv run tox
 
       - name: Run linter
-        run: poetry run ruff check
+        run: uv run ruff check
 
   build:
     name: Build distribution 📦
@@ -53,28 +43,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v4
-
-      - name: Setup a local virtual environment (if no poetry.toml file)
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-
-      - uses: actions/cache@v3
-        name: Cache virtual environment
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          python-version-file: "pyproject.toml"
 
       - name: Build packages
-        run: poetry build
+        run: uv build
 
       - name: Upload distribution artifact
         uses: actions/upload-artifact@v4
@@ -83,9 +64,8 @@ jobs:
           path: dist/
 
   publish-and-release:
-    name: Publish to PyPI and create GitHub Release
+    name: Publish to PyPI and create GitHub Release 🚀
     needs: build
-    # This job will only run on push events where the commit message starts with "Merge pull request"
     if: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Merge pull request') }}
     runs-on: ubuntu-latest
     environment:
@@ -110,7 +90,7 @@ jobs:
           inputs: >-
             ./dist/*.tar.gz
             ./dist/*.whl
-
+  
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -123,11 +103,36 @@ jobs:
         run: |
           gh release upload "$GITHUB_REF_NAME" dist/** --repo "$GITHUB_REPOSITORY"
 
+  docs:
+    name: Create and publish documentation 📖
+    if: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Merge pull request') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - run: uv run mkdocs gh-deploy --force
+
   publish-to-testpypi:
-    name: Publish to TestPyPI
+    name: Publish to TestPyPI 🚀
     needs: build
-    # This job runs only on pull_request events (i.e. for open, updated, or reopened PRs)
-    if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
+    if: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Merge pull request') }}
     runs-on: ubuntu-latest
     environment:
       name: testpypi
