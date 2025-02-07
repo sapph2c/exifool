@@ -19,8 +19,9 @@ theme:
 repo_url: https://github.com/sapph2c/exifool
 repo_name: exifool
 site_author: sapph2c 
-site_url: https://docs.sapph2c.dev/exifool
+site_url: https://docs.sapph2c.dev/exifool/
 site_description: A metadata extraction tool written in Python.
+use_directory_urls: false
 plugins:
   - search
 extra_css:
