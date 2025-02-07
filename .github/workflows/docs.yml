@@ -1,41 +1,24 @@
-name: mkdocs
-
+name: Docs
 on:
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: "The commit SHA, tag, or branch to publish. Uses the default branch if not specified."
-        default: ""
-        type: string
-  workflow_call:
-    inputs:
-      plan:
-        required: true
-        type: string
+  push:
+    branches: [main]
 
 jobs:
-  mkdocs:
+  docs:
+    name: Build and publish docs 📖
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
           persist-credentials: true
 
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version-file: .python_version
 
       - name: "Set docs version"
-        env:
-          version: ${{ (inputs.plan != '' && fromJson(inputs.plan).announcement_tag) || inputs.ref }}
         run: |
-          # if version is missing, use 'latest'
-          if [ -z "$version" ]; then
-            echo "Using 'latest' as version"
-            version="latest"
-          fi
-
+          version="latest"
           # Use version as display name for now
           display_name="$version"
 
@@ -94,12 +77,10 @@ jobs:
             --label="documentation"
 
       - name: "Merge Pull Request"
-        if: ${{ inputs.plan != '' && !fromJson(inputs.plan).announcement_tag_is_implicit }}
         working-directory: sapph2c-docs
         env:
           GITHUB_TOKEN: ${{ secrets.SAPPH2C_DOCS_PAT }}
         run: |
-          # auto-merge the PR if the build was triggered by a release. 
           sleep 10
           gh pr merge --squash "${branch_name}"
 
