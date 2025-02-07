@@ -50,7 +50,7 @@ jobs:
           git config user.name "sapph2c-docs-bot"
           git config user.email "sapph2c-docs-bot@users.noreply.github.com"
 
-          git checkout -b new-docs
+          git checkout -b "${branch_name}"
           git add exifool
           git commit -m "Update exifool documentation for $version"
 
@@ -71,7 +71,7 @@ jobs:
           # Create the PR
           gh pr create \
             --base=main \
-            --head="new-docs" \
+            --head="${branch_name}" \
             --title="${pull_request_title}" \
             --body="Automated documentation update for ${display_name}" \
             --label="documentation"
