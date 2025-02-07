@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras --dev
 
+      - name: Install tox-uv plugin
+        run: uv tool install tox --with tox-uv
+
       - name: Run tests
         run: uv run tox
 
