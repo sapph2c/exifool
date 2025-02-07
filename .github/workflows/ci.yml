@@ -136,7 +136,8 @@ jobs:
       - name: Move Files to Subdirectory
         run: |
           mkdir -p site/exifool
-          mv site/* site/exifool/
+          shopt -s extglob 
+          mv site/!(exifool) site/exifool/
 
       - run: uv run mkdocs gh-deploy --force
 
