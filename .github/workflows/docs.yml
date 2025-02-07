@@ -1,0 +1,105 @@
+name: mkdocs
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "The commit SHA, tag, or branch to publish. Uses the default branch if not specified."
+        default: ""
+        type: string
+  workflow_call:
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  mkdocs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: "Set docs version"
+        env:
+          version: ${{ (inputs.plan != '' && fromJson(inputs.plan).announcement_tag) || inputs.ref }}
+        run: |
+          # if version is missing, use 'latest'
+          if [ -z "$version" ]; then
+            echo "Using 'latest' as version"
+            version="latest"
+          fi
+
+          # Use version as display name for now
+          display_name="$version"
+
+          echo "version=$version" >> "$GITHUB_ENV"
+          echo "display_name=$display_name" >> "$GITHUB_ENV"
+
+      - name: "Set branch name"
+        run: |
+          timestamp="$(date +%s)"
+          branch_display_name="$(echo "${display_name}" | tr -c '[:alnum:]._' '-' | tr -s '-')"
+          echo "branch_name=update-docs-$branch_display_name-$timestamp" >> "$GITHUB_ENV"
+          echo "timestamp=$timestamp" >> "$GITHUB_ENV"
+
+      - name: "Install dependencies"
+        run: pip install -r docs/requirements.txt
+
+      - name: "Build docs"
+        run: mkdocs build --strict
+
+      - name: "Clone docs repo"
+        run: git clone https://${{ secrets.SAPPH2C_DOCS_PAT }}@github.com/sapph2c/docs.git sapph2c-docs
+
+      - name: "Copy docs"
+        run: rm -rf sapph2c-docs/site/exifool && mkdir -p sapph2c-docs/site/exifool/ && cp -r site/ sapph2c-docs/site/exifool/
+
+      - name: "Commit docs"
+        working-directory: sapph2c-docs
+        run: |
+          git config user.name "sapph2c-docs-bot"
+          git config user.email "sapph2c-docs-bot@users.noreply.github.com"
+
+          git checkout -b "${branch_name}"
+          git add site/exifool
+          git commit -m "Update exifool documentation for $version"
+
+      - name: "Create Pull Request"
+        working-directory: sapph2c-docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.SAPPH2C_DOCS_PAT }}
+        run: |
+          pull_request_title="Update exifool documentation for ${display_name}"
+          
+          # If any PR is already open with the same title, close it.
+          gh pr list --state open --json title --jq '.[] | select(.title == "$pull_request_title") | .number' | \
+            xargs -I {} gh pr close {}
+
+          # Push the branch to GitHub
+          git push origin "${branch_name}"
+
+          # Create the PR
+          gh pr create \
+            --base=main \
+            --head="${branch_name}" \
+            --title="${pull_request_title}" \
+            --body="Automated documentation update for ${display_name}" \
+            --label="documentation"
+
+      - name: "Merge Pull Request"
+        if: ${{ inputs.plan != '' && !fromJson(inputs.plan).announcement_tag_is_implicit }}
+        working-directory: sapph2c-docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.SAPPH2C_DOCS_PAT }}
+        run: |
+          # auto-merge the PR if the build was triggered by a release. 
+          sleep 10
+          gh pr merge --squash "${branch_name}"
+

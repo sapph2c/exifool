@@ -106,41 +106,6 @@ jobs:
         run: |
           gh release upload "$GITHUB_REF_NAME" dist/** --repo "$GITHUB_REPOSITORY"
 
-  docs:
-    name: Create and publish documentation 📖
-    if: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Merge pull request') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: "pyproject.toml"
-
-      - name: Install dependencies
-        run: uv sync --all-extras --dev
-
-      - name: Build Site
-        run: uv run mkdocs build
-
-      - name: Move Files to Subdirectory
-        run: |
-          mkdir -p site/exifool
-          shopt -s extglob 
-          mv site/!(exifool) site/exifool/
-
-      - run: uv run mkdocs gh-deploy --force
-
   publish-to-testpypi:
     name: Publish to TestPyPI 🚀
     needs: build
