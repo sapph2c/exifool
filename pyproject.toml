@@ -1,28 +1,26 @@
 [project]
 name = "exifool"
-version = "0.1.4"
-description = "Metadata analysis tool written for CSEC-473"
-authors = [
-    {name = "sapph2c",email = "arn4006@g.rit.edu"}
-]
+version = "0.1.5"
+description = "Metadata retrieval tool"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "click (>=8.1.8,<9.0.0)",
-    "pypdf (>=5.2.0,<6.0.0)",
-    "rich (>=13.9.4,<14.0.0)",
+    "click>=8.1.8",
+    "pypdf>=5.2.0",
+    "rich>=13.9.4",
 ]
 
-[tool.poetry.scripts]
+[project.scripts]
 exifool = "exifool.cli:cli"
 
+[tool.uv]
+package = true
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-pytest-cov = "^6.0.0"
-tox = "^4.24.1"
-ruff = "^0.9.4"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "mkautodoc>=0.2.0",
+    "mkdocs-material>=9.6.2",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.5",
+]

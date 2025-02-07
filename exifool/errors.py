@@ -10,6 +10,7 @@ class ExifoolError(Exception):
     def __str__(self) -> str:
         return f"{self.message}, {self.error_code}"
 
+
 class UnsupportedFiletype(ExifoolError):
     """
     Exception that's raised when an unsupported file type is encountered.
