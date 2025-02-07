@@ -6,18 +6,17 @@ help: # Show help for each of the Makefile recipes.
 
 .PHONY: test
 test: # Run tests and generate coverage report
-	poetry run tox
+	uv run tox
 
 .PHONY: docs
 docs: # Build the documentation locally
-	poetry run sphinx-build -M html docs public 
+	uv run mkdocs build --strict
 
 .PHONY: lint
 lint: # Run linter
-	poetry run ruff check
+	uv run ruff check
 
 .PHONY: dev
-dev: # Install project dependencies and create a dev shell
-	poetry install
-	poetry shell
+dev: # Install project dependencies
+	uv sync
 
