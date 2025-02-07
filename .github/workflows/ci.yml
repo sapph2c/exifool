@@ -130,6 +130,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras --dev
 
+      - name: Build Site
+        run: uv run mkdocs build
+
+      - name: Move Files to Subdirectory
+        run: |
+          mkdir -p site/exifool
+          mv site/* site/exifool/
+
       - run: uv run mkdocs gh-deploy --force
 
   publish-to-testpypi:
