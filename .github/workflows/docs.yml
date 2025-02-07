@@ -51,7 +51,7 @@ jobs:
           git config user.email "sapph2c-docs-bot@users.noreply.github.com"
 
           git checkout -b new-docs
-          git add site/exifool
+          git add exifool
           git commit -m "Update exifool documentation for $version"
 
       - name: "Create Pull Request"
