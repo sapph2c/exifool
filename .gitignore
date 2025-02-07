@@ -4,3 +4,4 @@ dist
 *.coverage
 *.tox
 *.egg-info
+site

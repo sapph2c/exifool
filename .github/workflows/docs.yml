@@ -41,8 +41,14 @@ jobs:
       - name: "Clone docs repo"
         run: git clone https://${{ secrets.SAPPH2C_DOCS_PAT }}@github.com/sapph2c/docs.git sapph2c-docs
 
+      - name: "Debug"
+        run: ls -la
+
+      - name: "Debug p2"
+        run: ls site/
+
       - name: "Copy docs"
-        run: rm -rf sapph2c-docs/site/exifool && mkdir -p sapph2c-docs/site/exifool/ && cp -r site/ sapph2c-docs/site/exifool/
+        run: rm -rf sapph2c-docs/site/exifool && mkdir -p sapph2c-docs/site/exifool/ && cp -r site/* sapph2c-docs/site/exifool/
 
       - name: "Commit docs"
         working-directory: sapph2c-docs
