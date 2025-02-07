@@ -1,9 +1,8 @@
 # Installation
 
-> [!IMPORTANT]  
-> Exifool requires python 3.13+
-
 Exifool is available as a Python package on PyPI and can be installed using *uv* (recommended), *pipx*, or *pip*.
+
+**Note**: python 3.13+ is required
 
 Install using uv:
 
