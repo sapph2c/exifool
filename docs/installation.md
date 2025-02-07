@@ -1,6 +1,6 @@
 # Installation
 
-Exifool is available as a Python package on PyPI and can be installed using *uv* (recommended), *pipx*, or *pip*.
+Exifool is available as a Python package on PyPI and can be installed using `uv` (recommended), `pipx`, or `pip`.
 
 **Note**: python 3.13+ is required
 
