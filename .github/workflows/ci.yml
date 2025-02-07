@@ -98,13 +98,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --notes ""
+          gh release create $(sed -n 's/^version = "\([^"]*\)".*/\1/p') pyproject.toml) --repo "$GITHUB_REPOSITORY" --notes ""
 
       - name: Upload signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "$GITHUB_REF_NAME" dist/** --repo "$GITHUB_REPOSITORY"
+          gh release upload $(sed -n 's/^version = "\([^"]*\)".*/\1/p') dist/** --repo "$GITHUB_REPOSITORY"
 
   publish-to-testpypi:
     name: Publish to TestPyPI 🚀
