@@ -41,14 +41,8 @@ jobs:
       - name: "Clone docs repo"
         run: git clone https://${{ secrets.SAPPH2C_DOCS_PAT }}@github.com/sapph2c/docs.git sapph2c-docs
 
-      - name: "Debug"
-        run: ls -la
-
-      - name: "Debug p2"
-        run: ls site/
-
       - name: "Copy docs"
-        run: rm -rf sapph2c-docs/site/exifool && mkdir -p sapph2c-docs/site/exifool/ && cp -r site/* sapph2c-docs/site/exifool/
+        run: rm -rf sapph2c-docs/exifool && mkdir -p sapph2c-docs/exifool/ && cp -r site/* sapph2c-docs/exifool/
 
       - name: "Commit docs"
         working-directory: sapph2c-docs
@@ -56,7 +50,7 @@ jobs:
           git config user.name "sapph2c-docs-bot"
           git config user.email "sapph2c-docs-bot@users.noreply.github.com"
 
-          git checkout -b "${branch_name}"
+          git checkout -b new-docs
           git add site/exifool
           git commit -m "Update exifool documentation for $version"
 
@@ -72,12 +66,12 @@ jobs:
             xargs -I {} gh pr close {}
 
           # Push the branch to GitHub
-          git push origin "${branch_name}"
+          git push origin new-docs
 
           # Create the PR
           gh pr create \
             --base=main \
-            --head="${branch_name}" \
+            --head="new-docs" \
             --title="${pull_request_title}" \
             --body="Automated documentation update for ${display_name}" \
             --label="documentation"
